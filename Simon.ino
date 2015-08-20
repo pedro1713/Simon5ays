@@ -6,22 +6,16 @@
 #define CHOICE_1  (1 << 0)
 #define CHOICE_2  (1 << 1)
 #define CHOICE_3  (1 << 2)
-#define CHOICE_4  (1 << 3)
-#define CHOICE_5  (1 << 4)
 
 #define LED_1  12
 #define LED_2  11
 #define LED_3  10
-#define LED_4  9
-#define LED_5  8
 
 #define BUTTON_1    7
 #define BUTTON_2    6
 #define BUTTON_3    5
-#define BUTTON_4    4
-#define BUTTON_5    2
 
-#define SPEAKERPIN 13
+#define SPEAKERPIN 8
 
 //Game related definitions
 #define MODE_MEMORY 1
@@ -43,15 +37,11 @@ void setup()
 	pinMode(BUTTON_1, INPUT_PULLUP);
 	pinMode(BUTTON_2, INPUT_PULLUP);
 	pinMode(BUTTON_3, INPUT_PULLUP);
-	pinMode(BUTTON_4, INPUT_PULLUP);
-	pinMode(BUTTON_5, INPUT_PULLUP);
 	
 	//Setup outputs
 	pinMode(LED_1, OUTPUT);
 	pinMode(LED_2, OUTPUT);
 	pinMode(LED_3, OUTPUT);
-	pinMode(LED_4, OUTPUT);
-	pinMode(LED_5, OUTPUT);
 	pinMode(SPEAKERPIN, OUTPUT);
 
 	gameMode = MODE_MEMORY; //Set memory game by default
@@ -65,7 +55,7 @@ void loop()
 
 	//Start of game play
 	// Indicate the start of game play
-	setLEDs(CHOICE_1 | CHOICE_2 | CHOICE_3 | CHOICE_4 | CHOICE_5); // Turn all LEDs on
+	setLEDs(CHOICE_1 | CHOICE_2 | CHOICE_3); // Turn all LEDs on
 	delay(1000);
 	setLEDs(CHOICE_OFF); // Turn off LEDs
 	delay(500);
@@ -131,14 +121,12 @@ void playMoves(void)
 void add_to_moves(void)
 {
 	Serial.println("Adding one more");
-	byte newButton = random(0, 5); //min (included), max (exluded)
+	byte newButton = random(0, 3); //min (included), max (exluded)
 
 	// We have to convert this number, 0 to 3, to CHOICEs
 	if (newButton == 0) newButton = CHOICE_1;
 	else if (newButton == 1) newButton = CHOICE_2;
 	else if (newButton == 2) newButton = CHOICE_3;
-	else if (newButton == 3) newButton = CHOICE_4;
-	else if (newButton == 4) newButton = CHOICE_5;
 
 	gameBoard[gameRound++] = newButton; // Add this new button to the game array
 }
@@ -164,16 +152,6 @@ void setLEDs(byte leds)
 		digitalWrite(LED_3, HIGH);
 	else
 		digitalWrite(LED_3, LOW);
-
-	if ((leds & CHOICE_4) != 0)
-		digitalWrite(LED_4, HIGH);
-	else
-		digitalWrite(LED_4, LOW);
-
-	if ((leds & CHOICE_5) != 0)
-		digitalWrite(LED_5, HIGH);
-	else
-		digitalWrite(LED_5, LOW);
 }
 
 // Wait for a button to be pressed. 
@@ -210,8 +188,6 @@ byte checkButton(void)
 	if (digitalRead(BUTTON_1) == 0) return(CHOICE_1);
 	else if (digitalRead(BUTTON_2) == 0) return(CHOICE_2);
 	else if (digitalRead(BUTTON_3) == 0) return(CHOICE_3);
-	else if (digitalRead(BUTTON_4) == 0) return(CHOICE_4);
-	else if (digitalRead(BUTTON_5) == 0) return(CHOICE_5);
 
 	return(CHOICE_NONE); // If no button is pressed, return none
 }
@@ -234,15 +210,7 @@ void baitMode(void)
 		delay(250);
 		if (checkButton() != CHOICE_NONE) return;
 
-		setLEDs(CHOICE_4);
-		delay(250);
-		if (checkButton() != CHOICE_NONE) return;
-
-		setLEDs(CHOICE_5);
-		delay(250);
-		if (checkButton() != CHOICE_NONE) return;
-
-		setLEDs(CHOICE_1 | CHOICE_2 | CHOICE_3 | CHOICE_4 | CHOICE_5);
+		setLEDs(CHOICE_1 | CHOICE_2 | CHOICE_3);
 		delay(250);
 		if (checkButton() != CHOICE_NONE) return;
 
@@ -266,64 +234,56 @@ void playTone(byte button){
 		tone(SPEAKERPIN, NOTE_E4,125);
 		delay(150);
 	}
-	else if (button == CHOICE_4) {
-		tone(SPEAKERPIN, NOTE_F4,125);
-		delay(150);
-	}
-	else if (button == CHOICE_5) {
-		tone(SPEAKERPIN, NOTE_G4,125);
-		delay(150);
-	}
 	setLEDs(CHOICE_OFF);
 }
 
 void play_winner(void){
 	Serial.println("Winner song");
-	setLEDs(CHOICE_1 | CHOICE_2 | CHOICE_3 | CHOICE_4 | CHOICE_5); // Turn all LEDs on
+	setLEDs(CHOICE_1 | CHOICE_2 | CHOICE_3); // Turn all LEDs on
 	delay(250);
-	setLEDs(CHOICE_2 | CHOICE_4);
+	setLEDs(CHOICE_2);
 	tone(SPEAKERPIN, NOTE_E4, 125);
 	delay(150);
-	setLEDs(CHOICE_1 |  CHOICE_3  | CHOICE_5);
+	setLEDs(CHOICE_1 | CHOICE_3);
 	tone(SPEAKERPIN, NOTE_E4, 125);
 	delay(150);
-	setLEDs(CHOICE_1 | CHOICE_5);
+	setLEDs(CHOICE_1);
 	tone(SPEAKERPIN, NOTE_F4, 125);
 	delay(150);
 	setLEDs(CHOICE_3);
 	tone(SPEAKERPIN, NOTE_E4, 125);
 	delay(150);
-	setLEDs(CHOICE_1 | CHOICE_2 | CHOICE_3 | CHOICE_4 | CHOICE_5);
+	setLEDs(CHOICE_1 | CHOICE_2 | CHOICE_3);
 	tone(SPEAKERPIN, NOTE_D4, 375);
 	delay(425);
 	setLEDs(CHOICE_OFF);
 	tone(SPEAKERPIN, NOTE_G4, 125);
 	delay(150);
-	setLEDs(CHOICE_1 | CHOICE_2 | CHOICE_3 | CHOICE_4 | CHOICE_5);
+	setLEDs(CHOICE_1 | CHOICE_2 | CHOICE_3);
 	tone(SPEAKERPIN, NOTE_G4, 125);
 	delay(150);
 	setLEDs(CHOICE_OFF);
 	tone(SPEAKERPIN, NOTE_A4, 250);
 	delay(300);
-	setLEDs(CHOICE_1 | CHOICE_2 | CHOICE_3 | CHOICE_4 | CHOICE_5);
+	setLEDs(CHOICE_1 | CHOICE_2 | CHOICE_3);
 	tone(SPEAKERPIN, NOTE_G4, 625);
 	delay(725);
 }
 
 void play_loser(void){
 	Serial.println("Loser song");
-	setLEDs(CHOICE_1 | CHOICE_2 | CHOICE_3 | CHOICE_4 | CHOICE_5);
+	setLEDs(CHOICE_1 | CHOICE_2 | CHOICE_3);
 	delay(250);
-	setLEDs(CHOICE_3 | CHOICE_5);
+	setLEDs(CHOICE_3);
 	tone(SPEAKERPIN, NOTE_B5, 250);
 	delay(300);
 	setLEDs(CHOICE_1 | CHOICE_3);
 	tone(SPEAKERPIN, NOTE_A5, 250);
 	delay(300);
-	setLEDs(CHOICE_2 | CHOICE_4);
+	setLEDs(CHOICE_2);
 	tone(SPEAKERPIN, NOTE_G5, 250);
 	delay(300);
-	setLEDs(CHOICE_1 | CHOICE_2 | CHOICE_3 | CHOICE_4 | CHOICE_5);
+	setLEDs(CHOICE_1 | CHOICE_2 | CHOICE_3);
 	tone(SPEAKERPIN, NOTE_G5, 1000);
 	delay(1250);
 }
